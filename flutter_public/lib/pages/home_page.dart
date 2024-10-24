@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 
 class HomePageState extends State<HomePage> {
-  final String baseUrl = "https://localhost:7259/api";
+  final String baseUrl = "https://localhost:7066/api";
   List<dynamic> todaysGame = [];
   bool isLoading = true;
   bool haserror = false;

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class ApiHandler {
-  final String baseUrl = "https://localhost:7259/api";
+  final String baseUrl = "https://localhost:7066/api";
   final String? token;
 
   ApiHandler([this.token]);
