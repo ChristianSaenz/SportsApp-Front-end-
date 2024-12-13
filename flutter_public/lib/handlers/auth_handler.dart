@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthHandler {
-  final String baseUrl = "https://localhost:7259/api";
+  final String baseUrl = "https://localhost:7066/api";
 
   Future<String> login(String email, String password) async {
     try {
