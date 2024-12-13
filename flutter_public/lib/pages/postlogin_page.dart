@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 
-class PostloginPage extends StatelessWidget{
-  const PostloginPage({Key? key}) : super (key : key);
+class PostloginPage extends StatelessWidget {
+  const PostloginPage({Key? key}) : super(key: key);
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login Succesful'),
+        title: const Text('Login Successful'), 
         centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Succesfully Logged In!',
+            const Text( 
+              'Successfully Logged In!',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20), 
             ElevatedButton(
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/profile');
-              }, 
-              child: Text('View/Edit Profile'),
-              ),
-              ElevatedButton(
-                onPressed: () {
+              },
+              child: const Text('View/Edit Profile'), 
+            ),
+            ElevatedButton(
+              onPressed: () {
                 Navigator.pushReplacementNamed(context, '/home');
-              }, 
-              child: Text('Go to Home'),
+              },
+              child: const Text('Go to Home'), 
             ),
           ],
         ),

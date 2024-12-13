@@ -6,10 +6,8 @@ import 'package:sport_app/pages/postlogin_page.dart';
 import 'package:sport_app/pages/profile_page.dart';
 import 'package:sport_app/pages/scores_page.dart';
 
-
-
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,22 +15,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     return MaterialApp(
-      home: HomePage(),
+    return MaterialApp(
+      home: const HomePage(),
       routes: {
-        '/login' : (context) => LoginPage(), 
-        '/profile': (context) => ProfilePage(),
-        '/scores' : (context) => ScoresPage(),
-        '/postloginpage' : (context) => PostloginPage(), 
-        '/home' : (context) => HomePage()
+        '/login': (context) => const LoginPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/scores': (context) => const ScoresPage(),
+        '/postloginpage': (context) => const PostloginPage(),
+        '/home': (context) => const HomePage(),
       },
     );
   }
 }
 
-
 class CheckAuthPage extends StatelessWidget {
   final AuthHandler _authHandler = AuthHandler();
+
+  CheckAuthPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +39,20 @@ class CheckAuthPage extends StatelessWidget {
       future: _authHandler.getToken(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else {
-          if (snapshot.hasData && snapshot.data != null) { 
-            Future.microtask(() => Navigator.pushReplacementNamed(context, '/home'));
-          } else {
-            Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
-          }
-          return SizedBox(); 
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (snapshot.hasData && snapshot.data != null) {
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, '/home');
+              }
+            } else {
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            }
+          });
+          return const SizedBox();
         }
       },
     );

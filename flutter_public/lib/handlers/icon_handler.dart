@@ -8,14 +8,14 @@ IconData getSportIcon(String sportName) {
       return Icons.sports_football;
     case 'basketball':
       return Icons.sports_basketball;
-    case 'tennis':
-      return Icons.sports_tennis;
-    case 'ufc':
+    case 'baseball':
+      return Icons.sports_baseball;
+    case 'mma':
       return Icons.sports_mma;
     case 'hockey':
       return Icons.sports_hockey;
-    case 'golf':
-      return Icons.sports_golf;
+    case 'tennis':
+      return Icons.sports_tennis;
     case 'f1':
       return Icons.sports_motorsports;
 

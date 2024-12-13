@@ -1,116 +1,177 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:logger/logger.dart';
+import 'package:sport_app/handlers/api_handler.dart';
 
 final logger = Logger();
 
-
-
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key); 
+
   @override
   HomePageState createState() => HomePageState();
- }
-
+}
 
 class HomePageState extends State<HomePage> {
-  final String baseUrl = "https://localhost:7066/api";
+  final ApiHandler apiHandler = ApiHandler();
+
   List<dynamic> todaysGame = [];
   bool isLoading = true;
-  bool haserror = false;
+  bool hasError = false;
 
-  @override 
+  @override
   void initState() {
     super.initState();
-    fetchTodaysGames();
+    fetchGames();
   }
 
-  Future<void> fetchTodaysGames() async {
-   logger.d('Fetching today\'s games...');
+  Future<void> fetchGames() async {
+    setState(() {
+      isLoading = true;
+      hasError = false;
+    });
 
     try {
-      final response = await http.get(Uri.parse('$baseUrl/Match/today'));
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-
-       if (data is Map<String, dynamic> && data.containsKey('message')) {
-        logger.i(data['message']);
-        setState(() {
-          todaysGame = []; 
-          isLoading = false;
-        });
-      } else if (data is List) {
-        logger.i('Data fetched successfully.');
-        setState(() {
-          todaysGame = data; 
-          isLoading = false;
-        });
-      }
-      } else {
-        logger.e('Failed to fetch games. Status code: ${response.statusCode}');
-        setState(() {
-          haserror = true;
-        });
-      }
-    } catch (e) {
-      logger.e('Error occurred while fetching games: $e');
+      final games = await apiHandler.fetchTodaysGames();
       setState(() {
-        haserror = true;
+        todaysGame = games;
+        isLoading = false;
+      });
+    } catch (e) {
+      logger.e('Error fetching games: $e');
+      setState(() {
+        hasError = true;
+        isLoading = false;
       });
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Home Page'),
-      centerTitle: true, 
-    ),
-    body: Column(
-      children: [
-        Expanded(
-          child: isLoading
-              ? Center(child: CircularProgressIndicator())
-              : haserror
-                  ? Center(child: Text('Failed to load games', style: TextStyle(color: Colors.red)))
-                  : todaysGame.isEmpty
-                      ? Center(child: Text('No games scheduled for today.'))
-                      : ListView.builder(
-                          itemCount: todaysGame.length,
-                          itemBuilder: (context, index) {
-                            var game = todaysGame[index];
-                            return ListTile(
-                              title: Text('${game['HomeTeam']}  vs ${game['AwayTeam']}'),
-                              subtitle: Text('Time: ${game['MatchTime']}'),
-                            );
-                          },
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Today\'s Matches'), 
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator()) 
+                : hasError
+                    ? const Center(
+                        child: Text(
+                          'Failed to load games',
+                          style: TextStyle(color: Colors.red),
                         ),
+                      )
+                    : todaysGame.isEmpty
+                        ? const Center(
+                            child: Text('No games scheduled for today.'),
+                          )
+                        : ListView.builder(
+                            itemCount: todaysGame.length,
+                            itemBuilder: (context, index) {
+                              final game = todaysGame[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 30.0, vertical: 8.0),
+                                elevation: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          if (game['HomeTeamBadge'] != null &&
+                                              game['HomeTeamBadge']
+                                                  .toString()
+                                                  .isNotEmpty)
+                                            Image.network(
+                                              game['HomeTeamBadge'],
+                                              width: 40,
+                                              height: 40,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          const SizedBox(width: 20), 
+                                          if (game['AwayTeamBadge'] != null &&
+                                              game['AwayTeamBadge']
+                                                  .toString()
+                                                  .isNotEmpty)
+                                            Image.network(
+                                              game['AwayTeamBadge'],
+                                              width: 40,
+                                              height: 40,
+                                              fit: BoxFit.contain,
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        '${game['HomeTeam']} vs ${game['AwayTeam']}',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle( 
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 8), 
+                                      Text(
+                                        'Time: ${game['MatchTime']} | League: ${game['League']}',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 14), 
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
           ),
-          Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(Icons.login),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.score),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/scores');
-                },
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade400,
+                  offset: const Offset(0, -1), 
+                  blurRadius: 5,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.login),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/checkAuth');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.score), 
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/scores');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.person), 
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/player');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.favorite),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/favorite');
+                  },
+                ),
+              ],
+            ),
           ),
-        SizedBox(height: 25), 
-      ] ,
+        ],
       ),
     );
   }
 }
-
-
