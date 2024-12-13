@@ -393,11 +393,11 @@ class PlayersPageState extends State<PlayersPage> {
                         ),
                         const SizedBox(height: 8.0),
                         Text(
-                          'Position: ${player['postion'] ?? 'Unknown'}',
+                          'Position: ${player['position'] ?? 'Unknown'}',
                           style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                         ),
                         Text(
-                          'Age: ${player['age'] ?? '25'}',
+                          'Age: ${player['age'] ?? 'Unknown'}',
                           style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                         ),
                         Text(
